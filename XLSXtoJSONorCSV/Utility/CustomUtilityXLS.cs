@@ -9,17 +9,39 @@ namespace XLSXtoJSONorCSV.Utility
 {
     internal class CustomUtilityXLS
     {
-        public static void ConvertXLSXtoJSON()
+        public static void ConvertXLSXtoJSON(string projectDir, string fileName, List<Dictionary<string, object>> data)
         {
+            string outputFilePath = Path.Combine(projectDir, "Results", fileName.Replace(".xlsx", ".json"));
 
+            if (File.Exists(outputFilePath))
+            {
+                Console.WriteLine("File already exists. Do you want to overwrite it? (Y/N)");
+                var response = Console.ReadLine();
+
+                if (response.ToLower() == "y")
+                {
+                    File.WriteAllText(outputFilePath, JsonConvert.SerializeObject(data));
+                    Console.WriteLine("File overwritten successfully.");
+                }
+                else
+                {
+                    outputFilePath = Path.Combine(projectDir, "Results", $"{fileName.Replace(".xlsx", "")}_{DateTime.Now.ToString("yyyyMMddHHmmss")}.json");
+                    File.WriteAllText(outputFilePath, JsonConvert.SerializeObject(data));
+                    Console.WriteLine("File created successfully.");
+                }
+            }
+            else
+            {
+                File.WriteAllText(outputFilePath, JsonConvert.SerializeObject(data));
+                Console.WriteLine("File created successfully.");
+            }
         }
 
-        public static void ConvertXLSXtoCSV()
+        public static void ConvertXLSXtoXML()
         {
-
         }
 
-        public static void ConvertXLXStoDesiredFormat(string fileName)
+        public static void ConvertXLXStoDesiredFormat(string fileName, string to)
         {
             try
             {
@@ -32,7 +54,7 @@ namespace XLSXtoJSONorCSV.Utility
                 string inputFilePath = Path.Combine(projectDir, "Data", fileName);
 
                 if (!File.Exists(inputFilePath))
-                    throw new FileNotFoundException("File not found", inputFilePath);
+                    throw new FileNotFoundException("File with name " + fileName + " not found.");
 
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -42,40 +64,26 @@ namespace XLSXtoJSONorCSV.Utility
                 var rowCount = worksheet.Dimension.Rows;
                 var columnsCount = worksheet.Dimension.Columns;
 
-                var data = new object[rowCount, columnsCount];
+                var headers = new List<string>();
+                for (int col = 1; col <= columnsCount; col++)
+                    headers.Add(worksheet.Cells[1, col].Value.ToString());
 
-                for (int row = 1; row <= rowCount; row++)
+                var data = new List<Dictionary<string, object>>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var rowData = new Dictionary<string, object>();
                     for (int col = 1; col <= columnsCount; col++)
-                        data[row - 1, col - 1] = worksheet.Cells[row, col].Value;
+                        rowData[headers[col - 1]] = worksheet.Cells[row, col].Value;
 
-                // check if the there is a file in the Results folder with the same name as the value stored in fileName variable
-                // if it exists, ask the user if they want to overwrite the file
-                // if yes, overwrite the file
-                // if no, create a new file with a naming convention fileName + DateTime.Now.ToString("yyyyMMddHHmmss")
-                string outputFilePath = Path.Combine(projectDir, "Results", fileName.Replace(".xlsx", ".json"));
-
-                if (File.Exists(outputFilePath))
-                {
-                    Console.WriteLine("File already exists. Do you want to overwrite it? (Y/N)");
-                    var response = Console.ReadLine();
-
-                    if (response.ToLower() == "y")
-                    {
-                        File.WriteAllText(outputFilePath, JsonConvert.SerializeObject(data));
-                        Console.WriteLine("File overwritten successfully.");
-                    }
-                    else
-                    {
-                        outputFilePath = Path.Combine(projectDir, "Results", $"{fileName.Replace(".xlsx", "")}_{DateTime.Now.ToString("yyyyMMddHHmmss")}.json");
-                        File.WriteAllText(outputFilePath, JsonConvert.SerializeObject(data));
-                        Console.WriteLine("File created successfully.");
-                    }
+                    data.Add(rowData);
                 }
+
+                if (to.ToLower() == "json")
+                    ConvertXLSXtoJSON(projectDir, fileName, data);
+                else if (to.ToLower() == "xml")
+                    ConvertXLSXtoXML();
                 else
-                {
-                    File.WriteAllText(outputFilePath, JsonConvert.SerializeObject(data));
-                    Console.WriteLine("File created successfully.");
-                }
+                    throw new ArgumentException("Invalid output format. Please enter JSON or CSV.");
 
                 excelPackage.Dispose();
             }
