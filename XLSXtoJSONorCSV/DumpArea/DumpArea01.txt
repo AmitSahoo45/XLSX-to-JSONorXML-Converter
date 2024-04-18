@@ -1,0 +1,56 @@
+﻿# XLSX to XML Converter
+
+            var xmlDoc = new XmlDocument();
+            var root = xmlDoc.CreateElement("Rows");
+            xmlDoc.AppendChild(root);
+
+            string outputFilePath = Path.Combine(projectDir, "Results", "XML", fileName.Replace(".xlsx", ".xml"));
+
+            if (File.Exists(outputFilePath))
+            {
+                Console.WriteLine("File already exists. Do you want to overwrite it? (Y/N)");
+                var response = Console.ReadLine();
+
+                if (response.ToLower() == "y")
+                {
+                    foreach (var row in data)
+                    {
+                        var rowElement = xmlDoc.CreateElement("Row");
+                        root.AppendChild(rowElement);
+
+                        foreach (var key in row.Keys)
+                        {
+                            var element = xmlDoc.CreateElement(key); 
+                            element.InnerText = row[key].ToString();
+                            rowElement.AppendChild(element);
+                        }
+                    }
+
+                    xmlDoc.Save(outputFilePath);
+                    Console.WriteLine("File overwritten successfully.");
+                }
+                else
+                {
+                    outputFilePath = Path.Combine(projectDir, "Results", "XML", $"{fileName.Replace(".xlsx", "")}_{DateTime.Now.ToString("yyyyMMddHHmmss")}.xml");
+                    xmlDoc.Save(outputFilePath); 
+                    Console.WriteLine("File not overwritten.");
+                }
+            }
+            else
+            {
+                foreach (var row in data)
+                {
+                    var rowElement = xmlDoc.CreateElement("Row");
+                    root.AppendChild(rowElement);
+
+                    foreach (var key in row.Keys)
+                    {
+                        var element = xmlDoc.CreateElement(key); 
+                        element.InnerText = row[key].ToString();
+                        rowElement.AppendChild(element);
+                    }
+                }
+
+                xmlDoc.Save(outputFilePath);
+                Console.WriteLine("File created successfully.");
+            }

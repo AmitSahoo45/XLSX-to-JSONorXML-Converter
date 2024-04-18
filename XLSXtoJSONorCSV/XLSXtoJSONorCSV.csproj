@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Aspose.Cells, Version=24.4.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
+      <HintPath>..\packages\Aspose.Cells.24.4.0\lib\net40\Aspose.Cells.dll</HintPath>
+    </Reference>
     <Reference Include="EPPlus, Version=7.1.1.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
       <HintPath>..\packages\EPPlus.7.1.1\lib\net462\EPPlus.dll</HintPath>
     </Reference>
@@ -81,6 +84,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\CustomUtilityXLS.cs" />
+    <Compile Include="Utility\Helper\ForXMLFormat.cs" />
+    <Compile Include="Utility\Helper\Functions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -89,9 +94,14 @@
     <None Include="Data\sample03.xlsx" />
     <None Include="Data\sample04.xlsx" />
     <None Include="packages.config" />
+    <None Include="readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Results\" />
+    <Folder Include="Results\JSON\" />
+    <Folder Include="Results\XML\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DumpArea\DumpArea01.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -33,7 +33,7 @@ namespace XLSXtoJSONorCSV
                         break;
                 }
 
-                CustomUtilityXLS.ConvertXLXStoDesiredFormat(fileName, type);
+                CustomUtilityXLS.ConvertXLSXtoDesiredFormat(fileName, type);
 
                 Console.WriteLine("Do you want to convert another file? (Y/N)");
                 var response = Console.ReadLine();
