@@ -41,23 +41,12 @@ namespace XLSXtoJSONorCSV.Utility.Helper
                 Console.WriteLine("File already exists. Do you want to overwrite it? (Y/N)");
                 var response = Console.ReadLine();
 
-                if (response.ToLower() == "y")
-                {
-                    File.WriteAllText(outputFilePath, JsonConvert.SerializeObject(data));
-                    Console.WriteLine("File overwritten successfully.");
-                }
-                else
-                {
+                if (response.ToLower() == "n")
                     outputFilePath = Path.Combine(projectDir, "Results", "JSON", $"{fileName.Replace(".xlsx", "")}_{DateTime.Now.ToString("yyyyMMddHHmmss")}.json");
-                    File.WriteAllText(outputFilePath, JsonConvert.SerializeObject(data));
-                    Console.WriteLine("File created successfully.");
-                }
             }
-            else
-            {
-                File.WriteAllText(outputFilePath, JsonConvert.SerializeObject(data));
-                Console.WriteLine("File created successfully.");
-            }
+
+            File.WriteAllText(outputFilePath, JsonConvert.SerializeObject(data));
+            Console.WriteLine("File created successfully.");
 
             excelPackage.Dispose();
         }
@@ -67,6 +56,15 @@ namespace XLSXtoJSONorCSV.Utility.Helper
 
 
         #region Converting XLSX to XML
+        private static string GetUniqueOutputFilePath(string projectDir, string fileName)
+        {
+            string outputDirectory = Path.Combine(projectDir, "Results", "XML");
+            string baseFileName = Path.GetFileNameWithoutExtension(fileName);
+            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+            string uniqueFileName = $"{baseFileName}_{timestamp}.xml";
+            return Path.Combine(outputDirectory, uniqueFileName);
+        }
+
         public static void ConvertXLSXtoXML(string projectDir, string fileName)
         {
             string inputFilePath = Path.Combine(projectDir, "Data", fileName);
@@ -77,25 +75,12 @@ namespace XLSXtoJSONorCSV.Utility.Helper
                 Console.WriteLine("File already exists. Do you want to overwrite it? (Y/N)");
                 var response = Console.ReadLine();
 
-                if (response.ToLower() == "y")
-                {
-                    var workbook = new Workbook(inputFilePath);
-                    workbook.Save(outputFilePath);
-                }
-                else
-                {
-                    outputFilePath = Path.Combine(projectDir, "Results", "XML", $"{fileName.Replace(".xlsx", "")}_{DateTime.Now.ToString("yyyyMMddHHmmss")}.xml");
-                    var workbook = new Workbook(inputFilePath);
-                    workbook.Save(outputFilePath);
-                }
+                if (response.ToLower() != "y")
+                    outputFilePath = GetUniqueOutputFilePath(projectDir, fileName);
             }
-            else
-            {
-                var workbook = new Workbook(Path.Combine(projectDir, "Data", fileName));
 
-                fileName = fileName.Replace(".xlsx", ".xml");
-                workbook.Save(Path.Combine(projectDir, "Results", "XML", fileName));
-            }
+            var workbook = new Workbook(inputFilePath);
+            workbook.Save(outputFilePath, new XmlSaveOptions());
 
             Console.WriteLine("File created successfully.");
         }
