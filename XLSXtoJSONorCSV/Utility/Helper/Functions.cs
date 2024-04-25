@@ -52,9 +52,6 @@ namespace XLSXtoJSONorCSV.Utility.Helper
         }
         #endregion
 
-
-
-
         #region Converting XLSX to XML
         private static string GetUniqueOutputFilePath(string projectDir, string fileName)
         {
